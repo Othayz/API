@@ -18,8 +18,10 @@ func main() {
 
   // Routes
   e.GET("/students", getStudents)
+  e.POST("/students", createStudents)
   e.GET("/students/:id", getStudentsByID)
-  e.GET("/teachers", getTeachers)
+  e.PUT("/students/:id", updateStudentsByID)
+  e.DELETE("/students/:id", deleteStudentsByID)
 
   // Start server
   if err := e.Start(":8080"); err != nil && !errors.Is(err, http.ErrServerClosed) {
@@ -31,10 +33,19 @@ func main() {
 func getStudents(c echo.Context) error {
   return c.String(http.StatusOK, "list of all students")
 }
+func createStudents(c echo.Context) error {
+  return c.String(http.StatusOK, "create a new student")
+}
+
 func getStudentsByID(c echo.Context) error {
   id := c.Param("id")
   return c.String(http.StatusOK, id)
 }
-func getTeachers(c echo.Context) error {
-  return c.String(http.StatusOK, "list of all teachers")
+func updateStudentsByID(c echo.Context) error {
+  id := c.Param("id")
+  return c.String(http.StatusOK, id)
+}
+func deleteStudentsByID(c echo.Context) error {
+  id := c.Param("id")
+  return c.String(http.StatusOK, id)
 }
