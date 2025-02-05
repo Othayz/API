@@ -33,8 +33,13 @@ func main() {
 
 // Handler
 func getStudents(c echo.Context) error {
-  return c.String(http.StatusOK, "list of all students")
+  Students, err := db.GetStudentByID()
+  if err != nil {
+    return c.String(http.StatusNotFound, "error getting students")
+  }
+  return c.JSON(http.StatusOK, Students)
 }
+
 func createStudents(c echo.Context) error {
   student := db.Student{}
   if err := c.Bind(&student); err != nil {

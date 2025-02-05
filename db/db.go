@@ -36,3 +36,11 @@ func AddStudent(Student Student) error{
 	fmt.Println("Student added")
 	return nil
 }
+
+func GetStudentByID()([]Student, error){
+	students := []Student{}
+
+	db := Init()
+	err := db.Find(&students).Error
+	return students, err
+}
