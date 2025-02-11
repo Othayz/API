@@ -2,7 +2,7 @@ package main
 
 import (
 "github.com/Othayz/API/Apis"
-"log"
+"github.com/labstack/gommon/log"
 )
 
 func main() {
@@ -11,7 +11,7 @@ func main() {
   server.ConfigRoutes()
 
   if err := server.Start(); err != nil {
-    log.Fatal(err)
+    log.Fatalf("Failed to start server: %s", err.Error())
   }
 
 }

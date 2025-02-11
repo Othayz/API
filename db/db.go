@@ -1,8 +1,7 @@
 package db
 
 import (
-	"fmt"
-	"log"
+	"github.com/labstack/gommon/log"
 
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
@@ -26,7 +25,7 @@ func NewStudentHandler(db *gorm.DB) *StudentHandler {
 func Init() *gorm.DB {
 	db, err:= gorm.Open(sqlite.Open("student.db"), &gorm.Config{})
 	if err != nil {
-		log.Fatalln(err)
+		log.Fatalf("Failed to initialize SQLite: %s", err.Error())
 	}
 	db.AutoMigrate(&Student{})
 
@@ -35,9 +34,10 @@ func Init() *gorm.DB {
 
 func (s *StudentHandler) AddStudent(Student Student) error{
 	if result := s.DB.Create(&Student); result.Error != nil {
+		log.Error("Failed to add student")
 		return result.Error
 	}
-	fmt.Println("Student added")
+	log.Info("Student added")
 	return nil
 }
 
