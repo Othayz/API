@@ -2,6 +2,7 @@ package apis
 
 import (
 	"errors"
+	"fmt"
 	"net/http"
 	"strconv"
 
@@ -45,10 +46,48 @@ func (api *API) getStudents(c echo.Context) error {
 	return c.JSON(http.StatusOK, student)
   }
   func (api *API) updateStudentsByID(c echo.Context) error {
-	id := c.Param("id")
-	return c.String(http.StatusOK, id)
+	id, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		return c.String(http.StatusInternalServerError, "Failed to get student id")
+	}
+
+	receivedStudent := db.Student{}
+	if err := c.Bind(&receivedStudent); err != nil {
+	  return err
+	}
+
+	updatingStudent, err := api.DB.GetStudent(id)
+	if errors.Is(err, gorm.ErrRecordNotFound) {
+	  return c.String(http.StatusNotFound, "student not found")
+	}
+	student := updateStudInfo(&receivedStudent, &updatingStudent)
+	if err := api.DB.UpdateStudent(student); err != nil{
+	  return c.String(http.StatusInternalServerError, "Failed to save student")
+	}
+
+	return c.JSON(http.StatusOK, "Student updated")
   }
   func (api *API) deleteStudentsByID(c echo.Context) error {
 	id := c.Param("id")
-	return c.String(http.StatusOK, id)
+	deleteStud := fmt.Sprintf("Delete %s student", id)
+	return c.String(http.StatusOK, deleteStud)
+  }
+  func updateStudInfo(receivedStudent, updatingStudent *db.Student) db.Student {
+	if receivedStudent.Name != "" {
+	  updatingStudent.Name = receivedStudent.Name
+	}
+	if receivedStudent.CPF > 0 {
+	  updatingStudent.CPF = receivedStudent.CPF
+
+	}
+	if receivedStudent.Email != "" {
+	  updatingStudent.Email = receivedStudent.Email
+	}
+	if receivedStudent.Age > 0 {
+	  updatingStudent.Age = receivedStudent.Age
+	}
+	if receivedStudent.Active != updatingStudent.Active {
+	  updatingStudent.Active = receivedStudent.Active
+	}
+	return *updatingStudent
   }

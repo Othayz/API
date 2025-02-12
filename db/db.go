@@ -52,3 +52,7 @@ func (s *StudentHandler) GetStudent(id int) (Student, error) {
 	err := s.DB.First(&student, id)
 	return student, err.Error
   }
+
+func (s *StudentHandler) UpdateStudent(UpdateStudent Student)(error) {
+	return s.DB.Save(&UpdateStudent).Error
+}
