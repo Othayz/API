@@ -46,3 +46,9 @@ func (s *StudentHandler) GetStudentByID()([]Student, error){
 	err := s.DB.Find(&students).Error
 	return students, err
 }
+
+func (s *StudentHandler) GetStudent(id int) (Student, error) {
+	var student Student
+	err := s.DB.First(&student, id)
+	return student, err.Error
+  }

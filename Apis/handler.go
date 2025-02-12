@@ -1,9 +1,13 @@
 package apis
 
-import( 
-    "net/http"
-     "github.com/Othayz/API/db"
-	 "github.com/labstack/echo/v4"
+import (
+	"errors"
+	"net/http"
+	"strconv"
+
+	"github.com/Othayz/API/db"
+	"github.com/labstack/echo/v4"
+	"gorm.io/gorm"
 )
 
 func (api *API) getStudents(c echo.Context) error {
@@ -27,8 +31,18 @@ func (api *API) getStudents(c echo.Context) error {
   }
   
   func (api *API) getStudentsByID(c echo.Context) error {
-	id := c.Param("id")
-	return c.String(http.StatusOK, id)
+	id, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		return c.String(http.StatusInternalServerError, "Failed to get student id")
+	}
+	student, err := api.DB.GetStudent(id)
+	if errors.Is(err, gorm.ErrRecordNotFound) {
+	  return c.String(http.StatusNotFound, "student not found")
+	}
+	if err != nil {
+		return c.String(http.StatusInternalServerError, "Failed to getting student")
+	}
+	return c.JSON(http.StatusOK, student)
   }
   func (api *API) updateStudentsByID(c echo.Context) error {
 	id := c.Param("id")
