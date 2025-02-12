@@ -1,8 +1,9 @@
 package db
 
 import (
+	"github.com/Othayz/API/schemas"
 	"github.com/labstack/gommon/log"
-
+	
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
 )
@@ -10,14 +11,7 @@ import (
 type StudentHandler struct{
 	DB *gorm.DB
 }
-type Student struct {
-	gorm.Model
-	Name string     `json:"name"`
-	CPF int	        `json:"cpf"`
-	Email string	`json:"email"`
-	Age int	        `json:"age"`
-	Active bool	    `json:"registration"`
-}
+
 func NewStudentHandler(db *gorm.DB) *StudentHandler {
 	return &StudentHandler{DB: db}
 }
@@ -27,12 +21,12 @@ func Init() *gorm.DB {
 	if err != nil {
 		log.Fatalf("Failed to initialize SQLite: %s", err.Error())
 	}
-	db.AutoMigrate(&Student{})
+	db.AutoMigrate(&schemas.Student{})
 
 	return db
 }
 
-func (s *StudentHandler) AddStudent(Student Student) error{
+func (s *StudentHandler) AddStudent(Student schemas.Student) error{
 	if result := s.DB.Create(&Student); result.Error != nil {
 		log.Error("Failed to add student")
 		return result.Error
@@ -41,21 +35,21 @@ func (s *StudentHandler) AddStudent(Student Student) error{
 	return nil
 }
 
-func (s *StudentHandler) GetStudentByID()([]Student, error){
-	students := []Student{}
+func (s *StudentHandler) GetStudentByID()([]schemas.Student, error){
+	students := []schemas.Student{}
 	err := s.DB.Find(&students).Error
 	return students, err
 }
 
-func (s *StudentHandler) GetStudent(id int) (Student, error) {
-	var student Student
+func (s *StudentHandler) GetStudent(id int) (schemas.Student, error) {
+	var student schemas.Student
 	err := s.DB.First(&student, id)
 	return student, err.Error
   }
 
-func (s *StudentHandler) UpdateStudent(UpdateStudent Student)(error) {
+func (s *StudentHandler) UpdateStudent(UpdateStudent schemas.Student)(error) {
 	return s.DB.Save(&UpdateStudent).Error
 }
-func (s *StudentHandler) DeleteStudent(Student Student) error {
+func (s *StudentHandler) DeleteStudent(Student schemas.Student) error {
 	return s.DB.Delete(&Student).Error
 }
