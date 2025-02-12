@@ -2,7 +2,6 @@ package apis
 
 import (
 	"errors"
-	"fmt"
 	"net/http"
 	"strconv"
 
@@ -68,9 +67,19 @@ func (api *API) getStudents(c echo.Context) error {
 	return c.JSON(http.StatusOK, "Student updated")
   }
   func (api *API) deleteStudentsByID(c echo.Context) error {
-	id := c.Param("id")
-	deleteStud := fmt.Sprintf("Delete %s student", id)
-	return c.String(http.StatusOK, deleteStud)
+	id, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		return c.String(http.StatusInternalServerError, "Failed to get student id")
+	}
+	student, err := api.DB.GetStudent(id)
+	if errors.Is(err, gorm.ErrRecordNotFound) {
+	  return c.String(http.StatusNotFound, "student not found")
+	}
+	if err := api.DB.DeleteStudent(student); err != nil{
+		return c.String(http.StatusInternalServerError, "Failed to delete student")
+	  }
+	  return c.JSON(http.StatusOK, "Student deleted")
+
   }
   func updateStudInfo(receivedStudent, updatingStudent *db.Student) db.Student {
 	if receivedStudent.Name != "" {
