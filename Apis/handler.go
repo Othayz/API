@@ -2,9 +2,10 @@ package apis
 
 import (
 	"errors"
-	"github.com/rs/zerolog/log"
 	"net/http"
 	"strconv"
+
+	"github.com/rs/zerolog/log"
 
 	"github.com/Othayz/API/schemas"
 	"github.com/labstack/echo/v4"
@@ -16,7 +17,10 @@ func (api *API) getStudents(c echo.Context) error {
 	if err != nil {
 	  return c.String(http.StatusNotFound, "error getting students")
 	}
-	return c.JSON(http.StatusOK, Students)
+	
+	listOfStudents := map[string][]schemas.StudentResponse{"students": schemas.NewResponse(Students)}
+	
+	return c.JSON(http.StatusOK, listOfStudents)
   }
   
   func (api *API) createStudents(c echo.Context) error {
@@ -44,7 +48,7 @@ func (api *API) getStudents(c echo.Context) error {
 	  return c.String(http.StatusInternalServerError, "error adding student")
 	}
   
-	return c.String(http.StatusOK, "create a new student")
+	return c.JSON(http.StatusOK, student)
   }
   
   func (api *API) getStudentsByID(c echo.Context) error {
